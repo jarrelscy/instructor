@@ -254,6 +254,7 @@ def handle_response_model(
 
             if mode == Mode.JSON:
                 new_kwargs["response_format"] = {"type": "json_object"}
+                new_kwargs["extra_body"] = {"guided_json":response_model.model_json_schema()}
 
             elif mode == Mode.JSON_SCHEMA:
                 new_kwargs["response_format"] = {
@@ -271,13 +272,7 @@ def handle_response_model(
             # check that the first message is a system message
             # if it is not, add a system message to the beginning
             if new_kwargs["messages"][0]["role"] != "system":
-                new_kwargs["messages"].insert(
-                    0,
-                    {
-                        "role": "system",
-                        "content": message,
-                    },
-                )
+                new_kwargs["messages"][0]['content'] = message + new_kwargs["messages"][0]['content']
             # if it is, system append the schema to the end
             else:
                 new_kwargs["messages"][0]["content"] += f"\n\n{message}"
