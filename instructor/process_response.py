@@ -254,6 +254,7 @@ def handle_response_model(
 
             if mode == Mode.JSON:
                 new_kwargs["response_format"] = {"type": "json_object"}
+                # this line passes in the schema for VLLM 
                 new_kwargs["extra_body"] = {"guided_json":response_model.model_json_schema()}
 
             elif mode == Mode.JSON_SCHEMA:
