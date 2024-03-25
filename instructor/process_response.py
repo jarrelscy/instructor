@@ -9,6 +9,10 @@ from instructor.dsl.simple_type import AdapterBase, ModelAdapter, is_simple_type
 from instructor.function_calls import OpenAISchema, openai_schema
 
 from openai.types.chat import ChatCompletion
+from openai.types.chat.chat_completion_chunk import ChoiceDelta
+from openai.types.chat.chat_completion import Choice
+from openai.types.chat import ChatCompletion
+from openai.types.chat.chat_completion_message import ChatCompletionMessage
 from pydantic import BaseModel
 
 
@@ -65,6 +69,20 @@ async def process_response_async(
     if response_model is None:
         return response
 
+    if stream:
+        responses = []
+        async for r in response:
+            responses.append(r)
+        deltas = [response.choices[0].delta for response in responses]
+        content =''.join(delta.content for delta in deltas if delta.content)
+        response = ChatCompletion(id=responses[0].id, 
+                                        choices=[Choice(message=ChatCompletionMessage(content=content, role='assistant'), 
+                                                        finish_reason=responses[-1].choices[0].finish_reason, index=0, logprobs=None)], 
+                                        created=responses[0].created, 
+                                        model=responses[0].model, 
+                                        object='chat.completion', 
+                                        system_fingerprint=responses[0].system_fingerprint)
+    '''
     if (
         inspect.isclass(response_model)
         and issubclass(response_model, (IterableBase, PartialBase))
@@ -75,6 +93,7 @@ async def process_response_async(
             mode=mode,
         )
         return model
+    '''
 
     model = response_model.from_response(
         response,
@@ -218,12 +237,14 @@ def handle_response_model(
         if not issubclass(response_model, OpenAISchema):
             response_model = openai_schema(response_model)  # type: ignore
 
+        '''
         if new_kwargs.get("stream", False) and not issubclass(
             response_model, (IterableBase, PartialBase)
         ):
             raise NotImplementedError(
                 "stream=True is not supported when using response_model parameter for non-iterables"
             )
+        '''
 
         if mode == Mode.FUNCTIONS:
             new_kwargs["functions"] = [response_model.openai_schema]  # type: ignore
