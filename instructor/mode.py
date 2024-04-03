@@ -9,6 +9,7 @@ class Mode(enum.Enum):
     PARALLEL_TOOLS = "parallel_tool_call"
     TOOLS = "tool_call"
     MISTRAL_TOOLS = "mistral_tools"
+    UNGUIDED_JSON = "unguided_json_mode"
     JSON = "json_mode"
     MD_JSON = "markdown_json_mode"
     JSON_SCHEMA = "json_schema_mode"

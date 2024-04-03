@@ -302,6 +302,22 @@ def handle_response_model(
             # if it is, system append the schema to the end
             else:
                 new_kwargs["messages"][0]["content"] += f"\n\n{message}"
+        elif mode in {Mode.UNGUIDED_JSON}:
+            # If its a JSON Mode we need to massage the prompt a bit
+            # in order to get the response we want in a json format
+            message = ''
+            # this line passes in the schema for VLLM 
+            # explicitly do not try to guide it. to use this mode your model must be fine tuned
+            # to return your schema already. 
+            # new_kwargs["extra_body"] = {"guided_json":response_model.model_json_schema()}
+
+            # check that the first message is a system message
+            # if it is not, add a system message to the beginning
+            if new_kwargs["messages"][0]["role"] != "system":
+                new_kwargs["messages"][0]['content'] = message + new_kwargs["messages"][0]['content']
+            # if it is, system append the schema to the end
+            else:
+                new_kwargs["messages"][0]["content"] += f"\n\n{message}"
         else:
             raise ValueError(f"Invalid patch mode: {mode}")
 
