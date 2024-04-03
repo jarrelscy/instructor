@@ -135,7 +135,7 @@ async def retry_async(
                         mode=mode,
                     )  # type: ignore[all]
                 except (ValidationError, JSONDecodeError) as e:
-                    logger.debug(f"Error response: {response}", e)
+                    logger.debug(f"Error response: {response} {e}")
                     kwargs["messages"].extend(reask_messages(response, mode, e))
                     raise e
     except RetryError as e:
