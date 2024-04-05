@@ -108,7 +108,7 @@ class OpenAISchema(BaseModel):  # type: ignore[misc]
                 context=validation_context,
                 strict=strict,
             )
-        elif mode in {Mode.JSON, Mode.JSON_SCHEMA, Mode.MD_JSON, Mode.UNGUIDED_JSON}:
+        elif mode in {Mode.JSON, Mode.JSON_SCHEMA, Mode.MD_JSON, Mode.UNGUIDED_JSON, Mode.PARSED_UNGUIDED_JSON}:
             if mode == Mode.MD_JSON:
                 message.content = extract_json_from_codeblock(message.content or "")
 
